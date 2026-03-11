@@ -27,7 +27,15 @@ Multitask artifacts:
 
 `*_model_*.pt` stores the trained checkpoint.
 
-`*_scalar_*.pt` stores the target-scaling metadata needed to invert predictions back to original units.
+`*_scalar_*.pt` stores the target-scaling metadata needed to invert predictions before the final fixed unit correction.
+
+The repository code also applies fixed post-scaling for:
+
+- `td`: multiply by `1e-7`
+- `dif`: multiply by `1e-5`
+- `visc`: multiply by `1e-3`
+
+If these checkpoints are loaded outside the repository code, the same correction must be applied manually after inverse scaling.
 
 ## Model Selection Map
 

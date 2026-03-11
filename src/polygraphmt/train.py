@@ -30,6 +30,7 @@ from .utils import (
     exp_weight_at_epoch,
     make_fid_loss_weights,
     apply_inverse_transform,
+    apply_post_scale,
 )
 
 
@@ -334,10 +335,9 @@ def evaluate(state: TrainState, loader, args, scaler: TargetScaler,
         for k, v in mv.items():
             metrics[f"{f}_{k}"] = v
 
-    # -------- Metrics in ORIGINAL physical units (after inverse transform) --------
-    # apply_inverse_transform handles per-task identity/log based on scaler
-    pred_orig = apply_inverse_transform(pred, scaler)
-    y_orig    = apply_inverse_transform(y, scaler)
+    # -------- Metrics in final reported units (after inverse transform + fixed post-scale) --------
+    pred_orig = apply_post_scale(apply_inverse_transform(pred, scaler), task_names)
+    y_orig    = apply_post_scale(apply_inverse_transform(y, scaler), task_names)
 
     overall_o = masked_metrics_overall(pred_orig, y_orig, mask)
     per_task_o = masked_metrics_per_task(pred_orig, y_orig, mask, task_names)
@@ -352,7 +352,7 @@ def evaluate(state: TrainState, loader, args, scaler: TargetScaler,
         for k, v in mv.items():
             metrics[f"{f}_{k}_orig"] = v
 
-    # -------- Uncertainty diagnostics (kept in normalized space; PI width in original) --------
+    # -------- Uncertainty diagnostics (kept in normalized space; PI width in reported units) --------
     if len(all_logvar) > 0:
         logvar = torch.cat(all_logvar, dim=0)  # [B, T]
         if logvar.dim() == 1:
@@ -364,9 +364,12 @@ def evaluate(state: TrainState, loader, args, scaler: TargetScaler,
         err_n = pred - y
         nll_mat = 0.5 * ( (err_n**2) / var_n + logvar + math.log(2*math.pi) )  # [B, T]
 
-        # 95% coverage; PI width in original units via linearized mapping
+        # 95% coverage; PI width in reported units via linearized mapping
         z95 = 1.959963984540054
-        std_orig = std_n * scaler.std.view(1, -1)  # NOTE: exact only for identity transform
+        std_orig = apply_post_scale(
+            std_n * scaler.std.view(1, -1),
+            task_names,
+        )  # NOTE: exact only for identity transform
         width95 = 2.0 * z95 * std_orig
 
         m_all = mask
@@ -422,9 +425,9 @@ def predict_and_save(state: TrainState, loader, args, scaler: TargetScaler,
         if mask.dim() == 1:
             mask = mask.view(pred_n.size(0), pred_n.size(1))
 
-        # back to original units
-        pred = apply_inverse_transform(pred_n, scaler).cpu()
-        y    = apply_inverse_transform(y_n, scaler).cpu()
+        # back to reported units
+        pred = apply_post_scale(apply_inverse_transform(pred_n, scaler), task_names).cpu()
+        y    = apply_post_scale(apply_inverse_transform(y_n, scaler), task_names).cpu()
 
         # optional std/PI if heteroscedastic
         logvar = out.get("logvar", None)
@@ -433,7 +436,7 @@ def predict_and_save(state: TrainState, loader, args, scaler: TargetScaler,
             if logvar.dim() == 1:
                 logvar = logvar.view(pred_n.size(0), pred_n.size(1))
             std_n = torch.sqrt(torch.exp(logvar))
-            std_orig = std_n * scaler.std.view(1, -1)
+            std_orig = apply_post_scale(std_n * scaler.std.view(1, -1), task_names)
             z95 = 1.959963984540054
             lo95 = pred - z95 * std_orig
             hi95 = pred + z95 * std_orig

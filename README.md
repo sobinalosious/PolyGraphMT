@@ -376,12 +376,20 @@ If Optuna is used, the parent output directory also contains:
 - `run_config.json`: exact arguments used for the run
 - `history.json`: epoch-by-epoch training loss and validation metrics
 - `metrics_*.json`: summary metrics for each split
-- `predictions_*.csv`: per-sample predictions in original units
+- `predictions_*.csv`: per-sample predictions in final reported units
+
+Fixed post-scaling is applied automatically after inverse scaling for:
+
+- `td`: multiply by `1e-7`
+- `dif`: multiply by `1e-5`
+- `visc`: multiply by `1e-3`
+
+This correction is applied in the current training/evaluation and prediction code, so exported predictions, uncertainties, and `_orig` metrics use the final reported units.
 
 The metrics JSON files contain both:
 
 - normalized or transformed-space metrics such as `overall_rmse`
-- original-unit metrics such as `overall_rmse_orig`
+- reported-unit metrics such as `overall_rmse_orig`
 
 ### Prediction CSV columns
 
@@ -508,7 +516,7 @@ Selection and weighting behavior:
 Checkpoint selection:
 
 - checkpoint selection is based on normalized or transformed-space metrics such as `overall_rmse`
-- original-unit metrics with `_orig` are still computed and saved for interpretation and reporting
+- reported-unit metrics with `_orig` are still computed and saved for interpretation and reporting
 
 ### Embedding regularization arguments
 

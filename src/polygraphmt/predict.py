@@ -12,7 +12,7 @@ from torch_geometric.loader import DataLoader as PYGDataLoader
 
 from .data_builder import TargetScaler, featurize_smiles
 from .model import build_model
-from .utils import apply_inverse_transform, to_device
+from .utils import apply_inverse_transform, apply_post_scale, to_device
 
 
 # =================================================
@@ -214,7 +214,10 @@ def predict_from_artifacts(
             batch = to_device(batch, device)
             out = model(batch)
             pred_n = out["pred"]
-            pred = apply_inverse_transform(pred_n, scaler).cpu()
+            pred = apply_post_scale(
+                apply_inverse_transform(pred_n, scaler),
+                task_names,
+            ).cpu()
 
             smiles_b = list(batch.smiles)
             for i in range(pred.shape[0]):

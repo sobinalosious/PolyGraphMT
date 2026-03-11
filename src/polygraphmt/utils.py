@@ -288,6 +288,13 @@ def make_fid_loss_weights(
 # Inference utilities
 # ---------------------------------------------------------
 
+POST_SCALE_FACTORS = {
+    "td": 1e-7,
+    "dif": 1e-5,
+    "visc": 1e-3,
+}
+
+
 def apply_inverse_transform(pred: torch.Tensor, scaler):
     """
     Apply inverse target scaling safely on the same device as pred.
@@ -304,6 +311,28 @@ def apply_inverse_transform(pred: torch.Tensor, scaler):
         scaler.eps = scaler.eps.to(dev)
 
     return scaler.inverse(pred)
+
+
+def apply_post_scale(values: torch.Tensor, task_names: Sequence[str]) -> torch.Tensor:
+    """
+    Apply fixed per-property unit corrections after inverse scaling.
+
+    This keeps exported predictions and `_orig` metrics in the final public units.
+    """
+    if values.ndim == 0:
+        return values
+    if values.shape[-1] != len(task_names):
+        raise ValueError(
+            f"Expected last dimension {values.shape[-1]} to match task count {len(task_names)}."
+        )
+
+    factors = values.new_ones(len(task_names))
+    for idx, task_name in enumerate(task_names):
+        factors[idx] = POST_SCALE_FACTORS.get(str(task_name).strip().lower(), 1.0)
+
+    view_shape = [1] * values.ndim
+    view_shape[-1] = len(task_names)
+    return values * factors.view(*view_shape)
 
 
 
