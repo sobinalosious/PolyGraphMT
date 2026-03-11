@@ -1,0 +1,17 @@
+name: polygraphmt
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy=1.26
+  - pandas=2.2
+  - scipy=1.11
+  - matplotlib=3.8
+  - tqdm=4.66
+  - optuna=3.6
+  - rdkit=2024.03
+  - pip:
+      - torch>=2.2,<2.6
+      - torch-geometric>=2.5,<3.0
+      - -e .

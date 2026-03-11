@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__/
+*.egg-info/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+build/
+dist/
+logs/
+splits/
+RESULTS_*/
+RESULTS_SUMMARY/
+results_hist/
+results_hist_mt/
+results_hist_st/
