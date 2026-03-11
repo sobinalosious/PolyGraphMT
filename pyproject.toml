@@ -23,6 +23,7 @@ dependencies = [
 [project.scripts]
 polygraphmt-train = "polygraphmt.train:main"
 polygraphmt-predict = "polygraphmt.predict:main"
+polygraphmt-predict-from-models = "polygraphmt.predict_from_models:main"
 polygraphmt-plot-hist-mt = "polygraphmt.plot_hist_mt:main"
 polygraphmt-plot-hist-st = "polygraphmt.plot_hist_st:main"
 polygraphmt-summarize-results = "polygraphmt.results_summary:main"

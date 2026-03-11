@@ -1,0 +1,114 @@
+{
+  "cp": {
+    "family": "multitask",
+    "task": "g2"
+  },
+  "poisson": {
+    "family": "multitask",
+    "task": "mechanical"
+  },
+  "alpha": {
+    "family": "multitask",
+    "task": "g1"
+  },
+  "rho": {
+    "family": "multitask",
+    "task": "g2"
+  },
+  "bandgap": {
+    "family": "single",
+    "task": "bandgap"
+  },
+  "bulk": {
+    "family": "single",
+    "task": "bulk"
+  },
+  "dc": {
+    "family": "single",
+    "task": "dc"
+  },
+  "dif": {
+    "family": "single",
+    "task": "dif"
+  },
+  "etotal": {
+    "family": "single",
+    "task": "etotal"
+  },
+  "homo": {
+    "family": "single",
+    "task": "homo"
+  },
+  "lumo": {
+    "family": "single",
+    "task": "lumo"
+  },
+  "mu": {
+    "family": "single",
+    "task": "mu"
+  },
+  "pch4": {
+    "family": "single",
+    "task": "pch4"
+  },
+  "pco2": {
+    "family": "single",
+    "task": "pco2"
+  },
+  "pe": {
+    "family": "single",
+    "task": "pe"
+  },
+  "ph2": {
+    "family": "single",
+    "task": "ph2"
+  },
+  "phe": {
+    "family": "single",
+    "task": "phe"
+  },
+  "pn2": {
+    "family": "single",
+    "task": "pn2"
+  },
+  "po2": {
+    "family": "single",
+    "task": "po2"
+  },
+  "rg": {
+    "family": "single",
+    "task": "rg"
+  },
+  "ri": {
+    "family": "single",
+    "task": "ri"
+  },
+  "shear": {
+    "family": "single",
+    "task": "shear"
+  },
+  "tc": {
+    "family": "single",
+    "task": "tc"
+  },
+  "td": {
+    "family": "single",
+    "task": "td"
+  },
+  "tg": {
+    "family": "single",
+    "task": "tg"
+  },
+  "tm": {
+    "family": "single",
+    "task": "tm"
+  },
+  "visc": {
+    "family": "single",
+    "task": "visc"
+  },
+  "young": {
+    "family": "single",
+    "task": "young"
+  }
+}

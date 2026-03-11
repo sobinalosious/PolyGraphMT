@@ -27,6 +27,7 @@ At a high level, the workflow is:
 
 ```text
 .
+├── models/                   # curated released checkpoints and scaler files
 ├── data/
 │   ├── README.md
 │   └── raw/                  # input CSV files
@@ -102,6 +103,7 @@ Verify the CLI entry points:
 ```bash
 python3 scripts/train.py --help
 python3 scripts/predict.py --help
+python3 scripts/predict_from_models.py --help
 python3 scripts/summarize_results.py --help
 ```
 
@@ -158,6 +160,23 @@ For comparable reruns, keep the following fixed:
 - all model and optimizer settings
 
 The training output directory contains the saved checkpoint, scaler, metrics JSON files, prediction CSV files, and generated plots.
+
+## Released Model Artifacts
+
+The repository also includes curated checkpoints under `models/`.
+
+- `models/single_models/` contains released single-task checkpoints
+- `models/multitask_models/` contains released multitask checkpoints
+- `models/best_model_map.json` defines which model family should be used for each property
+
+Only one seed is retained for each released model group in order to keep the repository smaller and easier to distribute.
+
+For artifact-based inference:
+
+- use `python3 scripts/predict_from_models.py ...` to resolve the correct released checkpoint automatically
+- use `python3 scripts/predict.py --ckpt_path ... --scaler_path ...` when selecting a specific artifact pair manually
+
+Additional details are documented in `models/README.md`.
 
 ## Input Data Format
 
@@ -292,6 +311,27 @@ python3 scripts/predict.py \
   --smiles "CCO,c1ccccc1" \
   --fidelity exp \
   --out_csv predictions.csv
+```
+
+Direct artifact mode is also supported:
+
+```bash
+python3 scripts/predict.py \
+  --ckpt_path models/single_models/tg_single_model_42.pt \
+  --scaler_path models/single_models/tg_single_scalar_42.pt \
+  --input_csv my_smiles.csv \
+  --fidelity exp \
+  --out_csv predictions_tg.csv
+```
+
+For released checkpoints under `models/`, the helper wrapper resolves the correct artifact pair automatically:
+
+```bash
+python3 scripts/predict_from_models.py \
+  --property cp \
+  --input_csv my_smiles.csv \
+  --fidelity exp \
+  --out_csv predictions_cp.csv
 ```
 
 ### 5. Summarize many results folders
