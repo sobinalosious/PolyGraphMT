@@ -10,6 +10,19 @@ PolyGraphMT is a graph neural network workflow for polymer property prediction w
 
 The repository is organized so it can be installed as a standard Python project, run locally from scripts, or submitted through cluster job scripts.
 
+## Citation
+
+If you use this code or the released model artifacts, please cite:
+
+```bibtex
+@article{alosious2026adept,
+  title={ADEPT-PolyGraphMT: Automated Molecular Simulation and Multi-Task Multi-Fidelity Machine Learning for Polymer Property Generation and Prediction},
+  author={Alosious, Sobin and Liu, Yuhan and Xu, Jiaxin and Liu, Gang and Zhang, Renzheng and Jiang, Meng and Luo, Tengfei},
+  journal={arXiv preprint arXiv:2603.27106},
+  year={2026}
+}
+```
+
 ## What The Repository Does
 
 At a high level, the workflow is:
@@ -42,11 +55,14 @@ At a high level, the workflow is:
 Key code files:
 
 - `src/polygraphmt/train.py`: training, evaluation, Optuna HPO
-- `src/polygraphmt/predict.py`: inference on new SMILES
+- `src/polygraphmt/predict.py`: inference on new SMILES from a run directory or an explicit checkpoint/scaler pair
+- `src/polygraphmt/predict_from_models.py`: resolve and run the correct released checkpoint under `models/`
 - `src/polygraphmt/data_builder.py`: CSV discovery, graph featurization, splits, scaling
 - `src/polygraphmt/model.py`: multi-task multi-fidelity model
 - `src/polygraphmt/conv.py`: GNN encoder blocks
+- `src/polygraphmt/utils.py`: shared helpers, including the fixed post-scaling unit corrections
 - `src/polygraphmt/plot_utils.py`: parity and calibration plots from train/val/test predictions
+- `src/polygraphmt/plot_hist_mt.py` / `plot_hist_st.py`: histogram plotting for ensemble predictions
 - `src/polygraphmt/results_summary.py`: summarize many `RESULTS_*` folders into CSVs and bar plots
 
 ## Requirements
@@ -106,6 +122,8 @@ python3 scripts/predict.py --help
 python3 scripts/predict_from_models.py --help
 python3 scripts/summarize_results.py --help
 ```
+
+Installing the package (for example via `pip install -e .`) also exposes equivalent console scripts: `polygraphmt-train`, `polygraphmt-predict`, `polygraphmt-predict-from-models`, `polygraphmt-plot-hist-mt`, `polygraphmt-plot-hist-st`, and `polygraphmt-summarize-results`.
 
 ## After Cloning This Repository
 
@@ -578,16 +596,19 @@ This setting supports learning-curve style experiments, for example training wit
 
 | Argument | Default | Meaning |
 | --- | --- | --- |
-| `--run_dir` | required | Directory containing `best.pt` and `target_scaler.pt` |
+| `--run_dir` | `None` | Directory containing `best.pt` and `target_scaler.pt` |
+| `--ckpt_path` | `None` | Path to a specific checkpoint `.pt` (direct artifact mode) |
+| `--scaler_path` | `None` | Path to the matching scaler `.pt` (direct artifact mode) |
 | `--input_csv` | `None` | CSV containing a `smiles` column |
 | `--smiles` | `None` | Comma-separated SMILES string |
 | `--fidelity` | `None` | Fidelity name or fidelity index |
 | `--batch_size` | `256` | Inference batch size |
 | `--device` | `cuda` | `cuda` or `cpu` |
-| `--out_csv` | `None` | Output CSV path; default is inside `run_dir` |
+| `--out_csv` | `None` | Output CSV path; defaults to `predictions_new.csv` inside the run/checkpoint directory |
 
 Inference rules:
 
+- provide either `--run_dir`, or a `--ckpt_path` and `--scaler_path` pair
 - exactly one of `--input_csv` or `--smiles` is required
 - single-fidelity checkpoints default to `exp`
 - inference fails if the requested fidelity is absent from the checkpoint metadata
