@@ -199,6 +199,30 @@ Additional details are documented in `models/README.md`.
 
 ## Input Data Format
 
+### Property definitions and units
+
+[`data/README.md`](data/README.md) is the reference for the bundled dataset.
+For every CSV in `data/raw/` it gives the full property name, symbol, stored
+units (including scale factors), method and simulation conditions. It also
+covers the glass-transition protocol, the file-name mapping to the ADEPT
+workflow, and known data-quality issues. Read it before using the raw values.
+In particular:
+
+- `TD_MD.csv` is **thermal diffusivity** (α<sub>T</sub>), stored in units of
+  10⁻⁷ m² s⁻¹. It is not a temperature, and it is the same quantity as
+  `ALPHAT_MD.csv` in ADEPT.
+- `DC_MD.csv` is the dimensionless relative permittivity (dielectric constant)
+  ε<sub>r</sub>. `PE_MD.csv` is the absolute permittivity
+  ε = ε<sub>r</sub>ε<sub>0</sub> in pF m⁻¹ (`PE = 8.854 × DC`).
+- `BANDGAP_DFT.csv` is the **monomer HOMO–LUMO gap** (LUMO − HOMO), not a
+  polymer band gap.
+- `TG_MD.csv` comes from a stepwise-cooling scan (10 K steps, 1 ns per step,
+  about 10 K ns⁻¹). The 140 K ns⁻¹ quench in the ADEPT equilibration protocol
+  is not used to determine T<sub>g</sub>.
+- `ETOTAL_DFT.csv` is in kcal mol⁻¹ and `ALPHA_DFT.csv` is in Å³.
+- `VISC_MD.csv` and `DIF_MD.csv` were simulated at T<sub>g</sub> + 50 K for
+  each polymer, not at 300 K.
+
 ### Supported directory layouts
 
 The loader supports either of these layouts under `data/raw/`:
@@ -399,9 +423,12 @@ If Optuna is used, the parent output directory also contains:
 
 Fixed post-scaling is applied automatically after inverse scaling for:
 
-- `td`: multiply by `1e-7`
-- `dif`: multiply by `1e-5`
-- `visc`: multiply by `1e-3`
+- `td`: multiply by `1e-7` (stored in 10⁻⁷ m² s⁻¹ → reported in m² s⁻¹)
+- `dif`: multiply by `1e-5` (stored in 10⁻⁵ cm² s⁻¹ → reported in cm² s⁻¹)
+- `visc`: multiply by `1e-3` (stored in mPa s → reported in Pa s)
+
+The raw CSV values in `data/raw/` are in the stored units. See
+[`data/README.md`](data/README.md) for the units of all properties.
 
 This correction is applied in the current training/evaluation and prediction code, so exported predictions, uncertainties, and `_orig` metrics use the final reported units.
 

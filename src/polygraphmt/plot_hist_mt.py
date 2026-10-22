@@ -78,18 +78,18 @@ def property_label_map() -> Dict[str, str]:
         "pch4": r"Predicted $P_{\mathrm{CH_4}}$ (Barrer)",
 
         # Electronic / Optical
-        "alpha":   r"Predicted $\alpha$ (a.u.)",
+        "alpha":   r"Predicted $\alpha$ ($\mathrm{\AA}^3$)",
         "homo":    r"Predicted $E_{\mathrm{HOMO}}$ (eV)",
         "lumo":    r"Predicted $E_{\mathrm{LUMO}}$ (eV)",
-        "bandgap": r"Predicted $E_g$ (eV)",
+        "bandgap": r"Predicted monomer HOMO$-$LUMO gap (eV)",
         "mu":      r"Predicted $\mu$ (Debye)",
-        "etotal":  r"Predicted $E_{\mathrm{total}}$ (eV)",
+        "etotal":  r"Predicted $E_{\mathrm{total}}$ (kcal/mol)",
         "ri":      r"Predicted $n$",
-        "dc":      r"Predicted $\varepsilon$",
-        "pe":      r"Predicted $\epsilon_r$",
+        "dc":      r"Predicted $\varepsilon_r$",
+        "pe":      r"Predicted $\varepsilon = \varepsilon_r\varepsilon_0$ (pF/m)",
 
         # Structural / Physical
-        "rg":  r"Predicted $R_g$ (\AA)",
+        "rg":  r"Predicted $R_g$ ($\mathrm{\AA}$)",
         "rho": r"Predicted $\rho$ (g/cm$^3$)",
     }
 
